@@ -1,0 +1,54 @@
+html,body{margin:0;background:transparent;overflow:hidden;font:12px "Segoe UI",sans-serif;user-select:none}
+body{height:100vh;box-sizing:border-box;display:flex}
+/* #wrap holds the strip and the tab; the tab always sits on the screen-edge side. */
+#wrap{display:flex;align-items:center;gap:4px}
+.edge-right #wrap{margin:auto 0 auto auto;flex-direction:row}
+.edge-left #wrap{margin:auto auto auto 0;flex-direction:row-reverse}
+.edge-top #wrap{margin:0 auto auto auto;flex-direction:column-reverse}
+.edge-bottom #wrap{margin:auto auto 0 auto;flex-direction:column}
+#strip{display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:14px;background:rgba(24,24,28,.82);border:1px solid rgba(255,255,255,.08)}
+.edge-top #strip,.edge-bottom #strip{flex-direction:row}
+#tab{display:grid;place-items:center;color:#bbb;background:rgba(24,24,28,.82);border:1px solid rgba(255,255,255,.08);cursor:grab;font-size:11px;touch-action:none}
+.edge-left #tab,.edge-right #tab{width:16px;height:56px;border-radius:8px}
+.edge-top #tab,.edge-bottom #tab{width:56px;height:16px;border-radius:8px}
+#tab:hover{color:#fff;background:rgba(60,60,68,.95)}
+body.dragging,body.dragging #tab{cursor:grabbing}
+#tab.attn{animation:tabblink 1s steps(2) infinite}
+@keyframes tabblink{50%{background:#ff9a3c;color:#fff}}
+/* collapsed: only the tab stays; expanding slides the strip in from the edge */
+.collapsed #strip{display:none}
+.edge-right #strip.slide{animation:in-r .18s ease-out}.edge-left #strip.slide{animation:in-l .18s ease-out}
+.edge-top #strip.slide{animation:in-t .18s ease-out}.edge-bottom #strip.slide{animation:in-b .18s ease-out}
+@keyframes in-r{from{transform:translateX(120%);opacity:0}}@keyframes in-l{from{transform:translateX(-120%);opacity:0}}
+@keyframes in-t{from{transform:translateY(-120%);opacity:0}}@keyframes in-b{from{transform:translateY(120%);opacity:0}}
+.edge-left #toast{left:8px;right:auto}
+.edge-top #toast{bottom:8px}.edge-bottom #toast{top:8px;bottom:auto}
+:root{--s:1}
+.tile{position:relative;width:calc(48px*var(--s));height:calc(48px*var(--s));border-radius:10px;background:rgba(255,255,255,.06);cursor:pointer;display:grid;place-items:center}
+.tile canvas{width:calc(42px*var(--s));height:calc(42px*var(--s));image-rendering:pixelated}
+.tile.focused{box-shadow:0 0 0 2px #fff}
+.tile.working canvas{animation:hop .5s steps(2) infinite}
+.tile.perm{animation:blink 1s steps(2) infinite}
+.tile.input{box-shadow:0 0 0 3px #ff9a3c;animation:ring 1.2s ease-in-out infinite}
+.tile.done{box-shadow:0 0 0 3px #3ccf6e}
+.tile.error{box-shadow:0 0 0 3px #e5484d}
+.tile.sleep canvas,.tile.ended canvas{opacity:.45}
+.tile.compacting canvas{animation:squash 1s ease-in-out infinite}
+.badge{position:absolute;top:-6px;right:-6px;font-size:11px;line-height:16px;min-width:16px;height:16px;border-radius:8px;text-align:center;color:#fff;font-weight:700}
+.badge.done{background:#3ccf6e}.badge.work{background:#555;letter-spacing:-1px}
+.tile.add{color:#aaa;font-size:24px;border:1px dashed rgba(255,255,255,.25);background:transparent}
+.tile.add:hover{color:#fff}
+@keyframes hop{50%{transform:translateY(-4px)}}
+@keyframes blink{50%{background:#ff9a3c}}
+@keyframes ring{50%{box-shadow:0 0 0 6px rgba(255,154,60,.35)}}
+@keyframes squash{50%{transform:scaleY(.82)}}
+#tip,#menu{position:fixed;background:#1d1d22;color:#eee;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 10px;box-shadow:0 4px 16px rgba(0,0,0,.5);z-index:9}
+#tip{pointer-events:none;max-width:210px}
+#tip b{display:block;margin-bottom:2px}#tip span{color:#aaa}
+#menu{padding:4px;min-width:150px}
+#menu .item{padding:5px 10px;border-radius:5px;cursor:pointer}#menu .item:hover{background:rgba(255,255,255,.1)}
+#menu .sep{height:1px;background:rgba(255,255,255,.1);margin:4px 0}
+#menu .row{display:flex;gap:6px;padding:4px 10px;flex-wrap:wrap}
+#menu .sw{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent}#menu .sw:hover{border-color:#fff}
+#toast{position:fixed;bottom:8px;right:8px;max-width:270px;background:#1d1d22;color:#eee;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px 12px;box-shadow:0 4px 16px rgba(0,0,0,.5);opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
+#toast.show{opacity:1;transform:none}#toast.err{border-color:#e5484d}
