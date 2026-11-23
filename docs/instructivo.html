@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perch para Windows - Instructivo</title>
+<style>
+  :root { --bg:#fbfaf8; --fg:#1f1d1a; --muted:#6b665e; --card:#fff; --line:#e4e0d8; --accent:#d97757; --code:#f3f0ea; --ok:#2f7d4f; --warn:#a8610f; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#181716; --fg:#ece8e1; --muted:#a09a90; --card:#222120; --line:#363330; --code:#2a2826; --ok:#6cc08d; --warn:#e0a24d; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 system-ui,"Segoe UI",sans-serif; }
+  .wrap { max-width:860px; margin:0 auto; padding:32px 16px 80px; }
+  h1 { font-size:2rem; margin:0 0 4px; }
+  h2 { font-size:1.4rem; margin:48px 0 12px; padding-top:16px; border-top:1px solid var(--line); }
+  h3 { font-size:1.05rem; margin:24px 0 6px; }
+  p, li { max-width:70ch; }
+  .sub { color:var(--muted); margin:0 0 16px; }
+  nav { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 0; }
+  nav a { padding:4px 12px; border:1px solid var(--line); border-radius:999px; color:var(--fg); text-decoration:none; font-size:.9rem; }
+  nav a:hover { border-color:var(--accent); color:var(--accent); }
+  code { background:var(--code); padding:1px 6px; border-radius:4px; font:.88em Consolas,monospace; }
+  pre { background:var(--code); padding:12px 14px; border-radius:8px; overflow-x:auto; margin:8px 0; }
+  pre code { padding:0; background:none; }
+  .note { border-left:3px solid var(--accent); background:var(--card); padding:10px 14px; border-radius:0 8px 8px 0; margin:12px 0; }
+  .note.warn { border-color:var(--warn); }
+  .table { overflow-x:auto; }
+  table { border-collapse:collapse; width:100%; font-size:.92rem; background:var(--card); }
+  th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--code); }
+  .yes { color:var(--ok); font-weight:600; }
+  .part { color:var(--warn); font-weight:600; }
+  ol > li, ul > li { margin:4px 0; }
+  footer { margin-top:56px; color:var(--muted); font-size:.85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Perch para Windows</h1>
+<p class="sub">Una tira flotante con una criatura pixel-art por cada sesi&oacute;n de Claude Code. Instructivo de instalaci&oacute;n, uso y configuraci&oacute;n.</p>
+<div class="note">Port no oficial de <a href="https://github.com/elrincondeldev/perch">Perch</a> (MIT) de Jose Ramon Montes Hermida. No est&aacute; afiliado a Anthropic ni respaldado por el autor original.</div>
+
+<nav>
+  <a href="#que-es">Qu&eacute; es</a>
+  <a href="#requisitos">Requisitos</a>
+  <a href="#instalar">Instalaci&oacute;n</a>
+  <a href="#uso">Uso</a>
+  <a href="#config">Configuraci&oacute;n</a>
+  <a href="#terminales">Terminales</a>
+  <a href="#comandos">Comandos</a>
+  <a href="#problemas">Problemas</a>
+  <a href="#desinstalar">Desinstalar</a>
+</nav>
+
+<h2 id="que-es">Qu&eacute; es</h2>
+<p>Perch <strong>no es un plugin de Claude Code</strong>: es una app aparte que se conecta a Claude Code mediante <em>hooks</em> en <code>~/.claude/settings.json</code>. Muestra en un borde de la pantalla una criatura por sesi&oacute;n, animada seg&uacute;n su estado (trabajando, esperando, terminada, dormida).</p>
+<pre><code>Claude Code -- hooks (curl.exe) --&gt; agente (Bun) &lt;-- WebSocket 127.0.0.1:7778 -- overlay (Electron) -- bandeja
+claude agents --json -- sondeo --&gt;     &#9492; SQLite: anclajes, iconos (%APPDATA%\perch)</code></pre>
+<p>Todo queda en <code>127.0.0.1</code>; nada sale de tu equipo.</p>
+
+<h2 id="requisitos">Requisitos</h2>
+<ul>
+  <li>Windows 10 u 11.</li>
+  <li><a href="https://bun.sh">Bun</a> 1.3 o superior.</li>
+  <li>Node.js 18 o superior.</li>
+  <li>Git for Windows (Claude Code ejecuta los hooks con su bash).</li>
+  <li>Claude Code CLI, ya funcionando en tu terminal.</li>
+</ul>
+<pre><code>winget install Oven-sh.Bun OpenJS.NodeJS.LTS Git.Git</code></pre>
+
+<h2 id="instalar">Instalaci&oacute;n</h2>
+<h3>Opci&oacute;n recomendada: el asistente</h3>
+<ol>
+  <li>Instala los requisitos de arriba.</li>
+  <li>Clona o copia la carpeta en cualquier ruta sin caracteres raros:
+    <pre><code>git clone https://github.com/harold001916/perch-windows</code></pre>
+  </li>
+  <li>Haz doble clic en <code>setup.bat</code>. El asistente, en espa&ntilde;ol:
+    <ol type="a">
+      <li>comprueba Bun, Node/npm, Git, curl.exe y <code>claude</code>, y te da el comando exacto de lo que falte;</li>
+      <li>instala las dependencias (agente y overlay, incluido Electron);</li>
+      <li>pregunta tu terminal, si saltar a una sesi&oacute;n ya abierta en vez de abrir una copia y, para Wave, si enfocar el bloque exacto;</li>
+      <li>pregunta el borde de la pantalla, el tama&ntilde;o, la acci&oacute;n del clic y las notificaciones;</li>
+      <li>ofrece instalar los hooks (con copia de seguridad), el arranque junto a Claude Code y el arranque con Windows; despu&eacute;s inicia Perch.</li>
+    </ol>
+  </li>
+  <li>Reinicia las sesiones de Claude Code que ya estuvieran abiertas, para que aparezcan.</li>
+</ol>
+<div class="note">Si ejecutas <code>setup.bat</code> otra vez abre un men&uacute;: reconfigurar (propone tus valores actuales), estado, arrancar, detener o desactivar todo. Escribe solo <code>%APPDATA%\perch\*.json</code> y, si aceptas, <code>~/.claude/settings.json</code> (copia: <code>settings.json.bak-perch-*</code>).</div>
+<p>Si algo falta justo despu&eacute;s de instalarlo, abre una ventana <strong>nueva</strong> para que se actualice el PATH.</p>
+
+<h3>Instalaci&oacute;n manual</h3>
+<pre><code>cd agent;   bun install
+cd ..\overlay; npm i; node node_modules/electron/install.js   # npm 11 omite el postinstall de Electron
+cd ..\agent;   bun src/perch.ts hooks install                 # a&ntilde;ade los hooks a ~/.claude/settings.json
+cd ..;         .\start.ps1                                    # agente (oculto) + overlay
+.\startup.ps1 install                                         # opcional: arrancar en cada inicio de sesi&oacute;n</code></pre>
+
+<h3>Instalarlo en otro PC</h3>
+<p>Copia la carpeta (puedes omitir <code>agent\node_modules</code> y <code>overlay\node_modules</code>) o cl&oacute;nala, y ejecuta <code>setup.bat</code> all&iacute;. La configuraci&oacute;n es por equipo y no se copia: el asistente la crea.</p>
+
+<h2 id="uso">Uso</h2>
+<ul>
+  <li><strong>La tira</strong> muestra las sesiones ancladas y las que est&aacute;n trabajando o esper&aacute;ndote. Las terminadas se quedan 5 minutos.</li>
+  <li><strong>Bot&oacute;n +</strong>: ancla cualquier sesi&oacute;n conocida.</li>
+  <li><strong>Hover</strong>: nombre y actividad.</li>
+  <li><strong>Clic</strong>: si la sesi&oacute;n est&aacute; viva, trae su ventana al frente; si no, la reanuda (<code>claude --resume &lt;id&gt;</code> en su carpeta).</li>
+  <li><strong>Clic derecho</strong>: anclar/desanclar, personaje, color y &laquo;Abrir en terminal / VS Code / carpeta&raquo;.</li>
+  <li><strong>Pesta&ntilde;a junto a la tira</strong>: un clic la desliza fuera de la pantalla y parpadea en naranja si una sesi&oacute;n te necesita. Arr&aacute;strala para pegar la tira a cualquier borde de cualquier monitor.</li>
+  <li><strong>Icono de bandeja</strong>: mostrar/ocultar, notificaciones, colapsar, borde, <em>Tama&ntilde;o</em> (75-200 %), <em>Al hacer clic abrir&hellip;</em> (Terminal / VS Code / Carpeta) y salir.</li>
+</ul>
+<h3>Notificaciones</h3>
+<p>Aparecen avisos de Windows cuando una sesi&oacute;n pide permiso, hace una pregunta, da un error o termina un turno de al menos 10 s. Al hacer clic en el aviso se abre la sesi&oacute;n. Con <code>onlyWhenUnfocused</code> activo no se muestran mientras una terminal o editor est&eacute; al frente.</p>
+
+<h2 id="config">Configuraci&oacute;n</h2>
+<p>Lo m&aacute;s c&oacute;modo es volver a ejecutar <code>setup.bat</code>. Tambi&eacute;n puedes editar a mano los archivos de <code>%APPDATA%\perch\</code>; despu&eacute;s ejecuta <code>.\perch.ps1 stop</code> y <code>.\perch.ps1 start</code>.</p>
+<div class="table"><table>
+<tr><th>Archivo</th><th>Clave</th><th>Valores</th><th>Por defecto</th><th>Cu&aacute;ndo se aplica</th></tr>
+<tr><td rowspan="5"><code>settings.json</code></td><td><code>terminal</code></td><td><code>wt</code>, <code>cmd</code>, <code>wave</code>, <code>custom</code></td><td><code>wt</code></td><td>cada clic</td></tr>
+<tr><td><code>command</code></td><td>lista de argumentos con <code>{id}</code> y <code>{cwd}</code> (para <code>custom</code>)</td><td>ninguno</td><td>cada clic</td></tr>
+<tr><td><code>focusExisting</code></td><td><code>true</code> / <code>false</code></td><td><code>true</code></td><td>cada clic</td></tr>
+<tr><td><code>waveFocusBlock</code></td><td><code>true</code> / <code>false</code></td><td><code>false</code></td><td>en unos 5 s; vuelve a ejecutar <code>hooks install</code> una vez</td></tr>
+<tr><td><code>defaultIcon</code></td><td><code>{"character","color"}</code></td><td><code>default</code>, <code>#d97757</code></td><td>al iniciar el agente</td></tr>
+<tr><td rowspan="4"><code>overlay.json</code></td><td><code>edge</code></td><td><code>left</code> <code>right</code> <code>top</code> <code>bottom</code></td><td><code>right</code></td><td>al instante (bandeja o arrastre)</td></tr>
+<tr><td><code>scale</code></td><td>0.5 a 2</td><td><code>1</code></td><td>al instante (bandeja)</td></tr>
+<tr><td><code>clickAction</code></td><td><code>terminal</code> <code>code</code> <code>folder</code></td><td><code>terminal</code></td><td>al instante (bandeja)</td></tr>
+<tr><td><code>notifications</code></td><td>ver abajo</td><td>activadas</td><td>en cada evento</td></tr>
+<tr><td><code>config.json</code></td><td><code>token</code></td><td>generado</td><td>&mdash;</td><td>no lo compartas: protege el WebSocket</td></tr>
+</table></div>
+<pre><code>{ "notifications": { "enabled": true, "done": true, "doneMinSeconds": 10, "onlyWhenUnfocused": true } }</code></pre>
+
+<h2 id="terminales">Terminales compatibles</h2>
+<p>El clic hace dos cosas distintas: <strong>enfocar</strong> la ventana de una sesi&oacute;n viva (se detecta sola, subiendo por el &aacute;rbol de procesos de <code>claude</code>) y <strong>reabrir</strong> una sesi&oacute;n terminada (depende de <code>terminal</code>).</p>
+<div class="table"><table>
+<tr><th>Terminal</th><th>Enfocar sesi&oacute;n viva</th><th>Reabrir sesi&oacute;n terminada</th></tr>
+<tr><td>Windows Terminal</td><td class="yes">S&iacute;</td><td class="yes">S&iacute; (<code>terminal: "wt"</code>)</td></tr>
+<tr><td>cmd / PowerShell</td><td class="yes">S&iacute;</td><td class="yes">S&iacute; (<code>cmd</code>)</td></tr>
+<tr><td>VS Code, Cursor, Windsurf</td><td class="yes">S&iacute;</td><td>V&iacute;a <code>clickAction: "code"</code></td></tr>
+<tr><td>Wave</td><td class="yes">S&iacute;, y bloque exacto con <code>waveFocusBlock</code></td><td class="part">Parcial: copia el comando al portapapeles y enfoca Wave</td></tr>
+<tr><td>Alacritty, WezTerm</td><td class="yes">S&iacute;</td><td class="yes">S&iacute; con <code>custom</code> (el asistente lo configura)</td></tr>
+<tr><td>Warp</td><td class="yes">S&iacute; (probado)</td><td class="part">No soportado: usa <code>wt</code> o <code>cmd</code> como respaldo</td></tr>
+</table></div>
+<div class="note warn"><strong>Warp.</strong> El foco de sesiones vivas est&aacute; probado con una sesi&oacute;n real. Para reabrir una sesi&oacute;n terminada no hay una l&iacute;nea de comandos de Warp en Windows confirmada, as&iacute; que no se ofrece; el asistente tampoco lo lista, as&iacute; que elige <code>wt</code> o <code>cmd</code> para esos casos.</div>
+<h3>Ejemplos de <code>settings.json</code></h3>
+<pre><code>{ "terminal": "wave", "focusExisting": true }
+
+{ "terminal": "custom",
+  "command": ["alacritty","--working-directory","{cwd}","-e","claude","--resume","{id}"] }</code></pre>
+<h3>Wave y el JWT</h3>
+<p>Con <code>waveFocusBlock</code> activo, los hooks reenv&iacute;an a Perch el bloque y la pesta&ntilde;a de Wave. El JWT de Wave es una credencial: se guarda <strong>solo en la memoria del agente</strong>, nunca en SQLite, logs ni WebSocket, y se descarta al terminar la sesi&oacute;n. <code>focusblock</code> act&uacute;a solo en la pesta&ntilde;a actual de Wave.</p>
+
+<h2 id="comandos">Comandos</h2>
+<div class="table"><table>
+<tr><th>Comando</th><th>Qu&eacute; hace</th></tr>
+<tr><td><code>.\perch.ps1 start</code> / <code>stop</code></td><td>Arranca o detiene agente y overlay.</td></tr>
+<tr><td><code>.\perch.ps1 status</code></td><td>Estado del agente, hooks, autoarranque y atajo de inicio.</td></tr>
+<tr><td><code>.\perch.ps1 enable</code></td><td>Instala los hooks y el arranque autom&aacute;tico al abrir Claude Code.</td></tr>
+<tr><td><code>.\perch.ps1 disable</code></td><td>Detiene Perch y quita ambos.</td></tr>
+<tr><td><code>.\startup.ps1 install</code> / <code>remove</code></td><td>Atajo de arranque con Windows (independiente de lo anterior).</td></tr>
+</table></div>
+
+<h2 id="problemas">Soluci&oacute;n de problemas</h2>
+<ul>
+  <li><strong>Aparece <code>!</code> en lugar de <code>+</code></strong>: el overlay no llega al agente. Ejecuta <code>.\perch.ps1 status</code> y luego <code>.\perch.ps1 start</code>. Logs: <code>%APPDATA%\perch\agent.err.log</code>.</li>
+  <li><strong>No aparecen sesiones</strong>: faltan los hooks (el estado lo indica) o la sesi&oacute;n se abri&oacute; antes de instalarlos; rein&iacute;ciala.</li>
+  <li><strong>Los hooks no hacen nada</strong>: Claude Code los ejecuta con Git Bash; comprueba que <code>git --version</code> funciona y que existe <code>curl.exe</code>.</li>
+  <li><strong>El clic no abre nada o abre otra terminal</strong>: revisa <code>terminal</code> y <code>focusExisting</code> en <code>settings.json</code>.</li>
+  <li><strong>La primera sesi&oacute;n tras arrancar Perch</strong> puede tardar hasta 3 s en aparecer: el agente a&uacute;n no escuchaba cuando se dispar&oacute; su hook y el sondeo la recoge enseguida.</li>
+</ul>
+
+<h2 id="desinstalar">Desinstalar</h2>
+<p><code>setup.bat</code> &rarr; <em>Desactivar todo</em>, o bien <code>.\perch.ps1 disable</code>. Despu&eacute;s borra la carpeta y <code>%APPDATA%\perch</code>. El atajo de inicio se quita con la misma opci&oacute;n (o con <code>.\startup.ps1 remove</code>). Para quitar solo los hooks: <code>bun agent/src/perch.ts hooks uninstall</code>.</p>
+
+<footer>
+  Perch para Windows &middot; MIT &middot; basado en <a href="https://github.com/elrincondeldev/perch">elrincondeldev/perch</a> &middot; <a href="https://github.com/harold001916/perch-windows">harold001916/perch-windows</a>
+</footer>
+</div>
+</body>
+</html>

@@ -120,7 +120,7 @@ ipcMain.on("interactive", (_e, on) => win && win.setIgnoreMouseEvents(!on, { for
 ipcMain.on("size", (_e, w, h) => { content = { w: Math.ceil(w), h: Math.ceil(h) }; place(); });
 ipcMain.on("collapsed", (_e, collapsed) => setCollapsed(!!collapsed, false));
 // ---------- notifications ----------
-const TERMINAL_HOSTS = new Set(["wave", "windowsterminal", "windowsterminalpreview", "code", "cursor", "windsurf", "alacritty", "wezterm-gui", "mintty", "hyper", "tabby", "powershell", "pwsh", "cmd", "conhost"]);
+const TERMINAL_HOSTS = new Set(["wave", "windowsterminal", "windowsterminalpreview", "code", "cursor", "windsurf", "alacritty", "wezterm-gui", "mintty", "hyper", "tabby", "warp", "powershell", "pwsh", "cmd", "conhost"]);
 const FOREGROUND_PS = path.join(__dirname, "foreground.ps1");
 
 /** Read fresh so hand edits to overlay.json apply without a restart. */

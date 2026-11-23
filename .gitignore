@@ -4,3 +4,5 @@ electron.log
 # personal work log of the port (paths, session names)
 STATE.md
 *.bak-perch-*
+# local project memory (resume notes)
+.memoria/

@@ -12,7 +12,7 @@ public class PerchWin {
   [DllImport("user32.dll")] public static extern void keybd_event(byte vk, byte scan, uint flags, UIntPtr extra);
 }
 "@
-$hosts = "Wave","WindowsTerminal","Code","Cursor","Windsurf","alacritty","wezterm-gui","mintty","Hyper","Tabby","WindowsTerminalPreview"
+$hosts = "Wave","WindowsTerminal","Code","Cursor","Windsurf","alacritty","wezterm-gui","mintty","Hyper","Tabby","WindowsTerminalPreview","warp"
 $procs = @{}; Get-CimInstance Win32_Process | ForEach-Object { $procs[[int]$_.ProcessId] = $_ }
 
 function Find-Window($p) {
@@ -24,13 +24,21 @@ function Find-Window($p) {
   }
 }
 
-$cur = $procs[[int]$procs[$TargetPid].ParentProcessId]
-$hit = $null; $depth = 0
-while ($cur -and $depth -lt 12) {
-  if ($cur.Name -ieq "explorer.exe") { break }
-  $w = Find-Window $cur
-  if ($w) { $hit = [pscustomobject]@{ Name = $cur.Name; Hwnd = [int64]$w.MainWindowHandle }; break }
-  $cur = $procs[[int]$cur.ParentProcessId]; $depth++
+$hit = $null
+# Pass 1: known terminal hosts anywhere up the chain (Warp's shell has its own hidden console window,
+# which would otherwise be picked first). Pass 2: nearest ancestor with any window (cmd/conhost windows).
+foreach ($knownOnly in $true, $false) {
+  $cur = $procs[[int]$procs[$TargetPid].ParentProcessId]; $depth = 0
+  while ($cur -and $depth -lt 12) {
+    if ($cur.Name -ieq "explorer.exe") { break }
+    $base = $cur.Name -replace "\.exe$", ""
+    if (-not $knownOnly -or $hosts -contains $base) {
+      $w = Find-Window $cur
+      if ($w) { $hit = [pscustomobject]@{ Name = $cur.Name; Hwnd = [int64]$w.MainWindowHandle }; break }
+    }
+    $cur = $procs[[int]$cur.ParentProcessId]; $depth++
+  }
+  if ($hit) { break }
 }
 if (-not $hit) { '{"found":false}'; exit 0 }
 if (-not $HostOnly) {
